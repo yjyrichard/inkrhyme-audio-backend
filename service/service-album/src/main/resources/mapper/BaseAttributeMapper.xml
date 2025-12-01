@@ -6,6 +6,50 @@
 
 <mapper namespace="com.yangjiayu.audio.album.mapper.BaseAttributeMapper">
 
+    <!--
+        mybatis 配置一对多的映射关系！
+        id 表示唯一标识
+        type:  返回的数据类型 集合的泛型；
+        autoMapping 自动映射
+    -->
+    <resultMap id="BaseAttributeMap" type="com.yangjiayu.audio.model.album.BaseAttribute" autoMapping="true">
+        <!--
+            id 标识主键
+            property 属性名称
+            column 数据库字段名称
+            result 表示表的普通字段
+        -->
+        <id property="id" column="id"></id>
+        <!--
+            collection 集合属性名称
+            ofType 集合中元素的数据类型
+        -->
+        <collection property="attributeValueList" ofType="com.yangjiayu.audio.model.album.BaseAttributeValue" autoMapping="true">
+            <id property="id" column="attribute_value_id"></id>
+        </collection>
+    </resultMap>
+
+    <sql id="baseAttributeSql">
+        ba.id,
+        ba.category1_id,
+        ba.attribute_name,
+        bav.id attribute_value_id,
+        bav.attribute_id,
+        bav.value_name
+    </sql>
+
+    <!--
+        select 标签标识查询
+        id 表示方法名
+        resultType 表示方法返回数据类型 单一的数据类型 select * from base_attribute;
+        resultMap  表示结果集映射关系 多表关联查询
+    -->
+    <select id="selectAttributeByCategory1Id" resultMap="BaseAttributeMap">
+        select
+        <include refid="baseAttributeSql"></include>
+        from base_attribute ba inner join base_attribute_value bav on ba.id = bav.attribute_id
+        where ba.category1_id=#{category1Id} and ba.is_deleted=0;
+    </select>
 
 </mapper>
 
